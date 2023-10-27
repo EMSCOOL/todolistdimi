@@ -4,85 +4,81 @@ import { useState } from 'react';
 function App() {
   //Initial wird ein leeres Array übergeben => keine Todos vorhanden
   const [todos, setTodos] = useState([]);
+  const [isAddButton, setIsAddButton] = useState(true);
+  let [textBoxValue, setTextBoxValue] = useState("");
   
   let fieldID = "inputfield_newtodo" //Anhand der Field-ID wird das Eingabefeld erkannt
 
   function updateTodoList(){
+    const id = Math.floor(1000 + Math.random() * 9000);
+    const value = document.getElementById(fieldID).value;
+
     let newToDo ={ 
-        value: document.getElementById(fieldID).value, 
-        id: 12345 //Diese ID ist leider NICHT eindeutig :-(   
+        value, 
+        id   
       }
     
     
     if(newToDo.value!==""){ 
-      todos.push(newToDo)
-      setTodos([...todos])
+      todos.push(newToDo);
+      setTodos([...todos]);
+      document.getElementById(fieldID).value = "";
     }
-    else{
-      //DAS ITEM ist LEER. Es wird nichts hinzugefügt}
+  }
+
+  function deleteTodo(id) {
+    const updatedArray = todos.filter(todo => todo.id !==  id);
+    setTodos(updatedArray);
+  }
+
+  function updateTodo(id) {
+    setIsAddButton(false);
+    
+    for (var i = 0; i < todos.length; i++) {
+      if (todos[i].id === id) {
+        document.getElementById(fieldID).value = todos[i].value; 
+      }
     }
   }
 
   return (
-    /*  
-        Die App besteht aus zwei Komponenten: 
-        1. Todoimputfield bestehend aus Eingabefeld und Button
-        2. ToDoList - eine tabelle, die alle Todos anzeigen soll
-    */
     <>
-      <TodoInputField onAddNewItem={updateTodoList} inputId= {fieldID} ></TodoInputField>
-      <ToDoList items={todos}></ToDoList>
+      <div className="container mt-5">
+        <div className="input-group row justify-content-md-center  ">
+          <input id={fieldID} type="text" className="form-control col " placeholder="Neue Aufgabe anlegen" aria-describedby="basic-addon2"></input>
+          <div className="input-group-append  col">
+            <button onClick={updateTodoList}  className="btn btn-primary btn-lg bi bi-plus-circle">{isAddButton === true ? "add" : "update"}</button>
+          </div>
+        </div>
+      </div>
+      <div className="container mt-5">
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">ID</th>
+              <th scope="col">Beschreibung</th>
+              <th scope="col">Bearbeiten</th>
+              <th scope="col">Löschen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {todos.map( (item, index )=> { 
+              return(<tr key={item.id}>
+                      <th scope="row">{index + 1}</th>
+                      <td >{item.id}</td>
+                      <td>{item.value}</td>
+                      <td><i className="bi bi-pencil-square" onClick={ () => updateTodo(item.id)}></i></td>
+                      <td><i className="bi bi-trash" onClick={ () => deleteTodo(item.id) }></i></td>
+                    </tr>)
+                }
+              )
+            }     
+          </tbody>
+        </table>
+      </div>
     </>
   );
-}
-/**
- * Die TodoInputField-Komponenten bestehend aus einem Eingabefeld und einem Button 
- * @param onAddNewItem - Callbackfuntkion, die bei Click auf den Button aufgerufen wird
- * @param inputId - ID des Eingabefelds
- * @param {*} param0 
- * @returns 
- */
-function TodoInputField({onAddNewItem, inputId}){
-  return (<>
-            <div className="container mt-5">
-              <div className="input-group row justify-content-md-center  ">
-                <input id={inputId} type="text" className="form-control col " placeholder="Neue Aufgabe anlegen" aria-label="Recipient's username" aria-describedby="basic-addon2"></input>
-                <div className="input-group-append  col">
-                  <button onClick={onAddNewItem}  className="btn btn-primary btn-lg bi bi-plus-circle">add</button>
-                </div>
-              </div>
-            </div>
-          </>)
-}
-
-function ToDoList({items}){
-  
-  return(<>
-          <div className="container mt-5">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Beschreibung</th>
-                  <th scope="col">Bearbeiten</th>
-                  <th scope="col">Löschen</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map( (item, index )=> { 
-                  return(<tr>
-                          <th scope="row">{index+1}</th>
-                          <td>{item.value}</td>
-                          <td><i class="bi bi-pencil-square"></i></td>
-                          <td><i class="bi bi-trash"></i></td>
-                        </tr>)
-                    }
-                  )
-                }     
-              </tbody>
-            </table>
-          </div>
-        </>)
 }
 
 export default App;
