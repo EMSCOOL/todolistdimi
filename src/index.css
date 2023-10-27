@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.active{
+  -webkit-box-shadow: 0px 0px 23px 1px rgba(58,255,43,0.45); 
+box-shadow: 0px 0px 23px 1px rgba(58,255,43,0.45);
+  z-index: 99;
+  position: relative;
+}

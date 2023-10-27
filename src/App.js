@@ -2,12 +2,11 @@ import './App.css';
 import { useState } from 'react';
 
 function App() {
-  //Initial wird ein leeres Array übergeben => keine Todos vorhanden
   const [todos, setTodos] = useState([]);
   const [isAddButton, setIsAddButton] = useState(true);
-  let [textBoxValue, setTextBoxValue] = useState("");
+  const [selectedTodoId, setSelectedTodoId] = useState(null);
   
-  let fieldID = "inputfield_newtodo" //Anhand der Field-ID wird das Eingabefeld erkannt
+  let fieldID = "inputfield_newtodo"
 
   function updateTodoList(){
     const id = Math.floor(1000 + Math.random() * 9000);
@@ -17,10 +16,22 @@ function App() {
         value, 
         id   
       }
-    
-    
+
     if(newToDo.value!==""){ 
-      todos.push(newToDo);
+      if (isAddButton) {
+        todos.push(newToDo);
+      } else {
+        for (let i = 0; i < todos.length; i++) {
+          if (todos[i].id === selectedTodoId) {
+            todos[i].value = value;
+          }
+        }
+        document.querySelectorAll('tr').forEach((item) => {
+          item.classList.remove('active');
+        })
+        setIsAddButton(true);
+        
+      }
       setTodos([...todos]);
       document.getElementById(fieldID).value = "";
     }
@@ -33,6 +44,7 @@ function App() {
 
   function updateTodo(id) {
     setIsAddButton(false);
+    setSelectedTodoId(id);
     
     for (var i = 0; i < todos.length; i++) {
       if (todos[i].id === id) {
@@ -63,18 +75,17 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {todos.map( (item, index )=> { 
-              return(<tr key={item.id}>
+          {todos.map( (item, index )=> { 
+              return(<tr key={item.id} className={item.id === selectedTodoId ? 'active' : ''}>
                       <th scope="row">{index + 1}</th>
                       <td >{item.id}</td>
                       <td>{item.value}</td>
-                      <td><i className="bi bi-pencil-square" onClick={ () => updateTodo(item.id)}></i></td>
-                      <td><i className="bi bi-trash" onClick={ () => deleteTodo(item.id) }></i></td>
+                      <td ><button className="btn btn-primary" onClick={() => updateTodo(item.id)}>Bearbeiten</button></td>
+                      <td ><button className="btn btn-primary" onClick={() => deleteTodo(item.id)}>Löschen</button></td>
                     </tr>)
-                }
-              )
-            }     
-          </tbody>
+            })}
+
+          </tbody> 
         </table>
       </div>
     </>
